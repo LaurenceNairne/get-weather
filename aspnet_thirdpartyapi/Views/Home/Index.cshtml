@@ -1,0 +1,24 @@
+﻿@model WeatherEditModel
+@{ 
+    ViewBag.Title = "WeatherGetter";
+}
+
+<h1>Weather Getter</h1>
+<form method="post">
+    <div>
+        <label asp-for="Latitude"></label>
+        <input asp-for="Latitude" />
+        <span asp-validation-for="Latitude"></span>
+    </div>
+    <div>
+        <label asp-for="Longitude"></label>
+        <input asp-for="Longitude" />
+        <span asp-validation-for="Longitude"></span>
+    </div>
+    <div>
+        <label asp-for="Time"></label>
+        <input asp-for="Time" />
+        <span asp-validation-for="Time"></span>
+    </div>
+    <input type="submit" name="GetWeather" value="Get Weather" />
+</form>
