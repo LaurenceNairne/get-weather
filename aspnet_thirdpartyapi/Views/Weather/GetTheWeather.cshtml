@@ -1,10 +1,11 @@
 ﻿@model WeatherModel
 @{
-    ViewBag.Title = Model.Timezone;
+    ViewBag.Title = "Gotten Weather";
 }
 
+<h1>The weather for @Model.Timezone</h1>
 <div>
-    <p>@Model.Currently.Summary</p>
-    <p>@Model.Currently.Temperature</p>
-    <p>@Model.Currently.Humidity</p>
+    <p>Summary: @Model.Currently.Summary</p>
+    <p>Temperature: @Model.Currently.Temperature &#8457</p>
+    <p>Humidity: @Model.Currently.Humidity &#37</p>
 </div>
