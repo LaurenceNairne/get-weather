@@ -1,11 +1,15 @@
 ﻿@model WeatherModel
 @{
     ViewBag.Title = "Gotten Weather";
+
+    int x = (int)Convert.ToDouble(Model.Currently.Temperature);
+    double y = Convert.ToDouble(Model.Currently.Humidity) * 100.00;
 }
 
-<h1>The weather for @Model.Timezone</h1>
+<h3>Latitude: @Model.Latitude</h3>
+<h3>Longitude: @Model.Longitude</h3>
 <div>
     <p>Summary: @Model.Currently.Summary</p>
-    <p>Temperature: @Model.Currently.Temperature &#8457</p>
-    <p>Humidity: @Model.Currently.Humidity &#37</p>
+    <p>Temperature: @x.ToString() &#8451</p>
+    <p>Humidity: @y.ToString() &#37</p>
 </div>
