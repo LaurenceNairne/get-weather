@@ -17,7 +17,7 @@ namespace aspnet_thirdpartyapi.Services
             {
                 var url = new Uri
                     ($"https://api.darksky.net/forecast/{darkSkyKey}/{lat},{lon},{time}?" +
-                    $"exclude=daily,hourly,minutely,alerts,flags?units=uk2");
+                    $"exclude=daily,hourly,minutely,alerts,flags&units=auto");
                 var response = await client.GetAsync(url);
 
                 string json;
