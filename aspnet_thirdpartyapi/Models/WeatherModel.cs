@@ -11,9 +11,6 @@ namespace aspnet_thirdpartyapi.Models
         [Required]
         public double Longitude { get; set; }
 
-        [Required]
-        public string Timezone { get; set; }
-
         public Currently Currently { get; set; }
     }
 }
