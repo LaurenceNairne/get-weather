@@ -7,6 +7,7 @@ using aspnet_thirdpartyapi.Models;
 
 namespace aspnet_thirdpartyapi.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class HomeController : Controller
     {
         [HttpGet]
