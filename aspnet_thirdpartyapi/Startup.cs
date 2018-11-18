@@ -18,7 +18,6 @@ namespace aspnet_thirdpartyapi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddScoped<IWeatherService, WeatherService>();
             services.AddScoped<IGetWeather, GetWeather>();
         }
 
