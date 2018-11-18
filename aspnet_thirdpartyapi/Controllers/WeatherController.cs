@@ -10,18 +10,18 @@ namespace aspnet_thirdpartyapi.Controllers
 {
     public class WeatherController : Controller
     {
-        private IWeatherService _weatherService;
+        private IGetWeather _getWeather;
 
-        public WeatherController(IWeatherService weatherService)
+        public WeatherController(IGetWeather getWeather)
         {
-            _weatherService = weatherService;
+            _getWeather = getWeather;
         }
 
         [HttpGet]
         [Route("/{lat}/{lon}/{time}")]
         public async Task<IActionResult> GetTheWeather(double lat, double lon, long time)
         {
-            var result = await _weatherService.GetWeatherBasedOnCriteria(lat,lon,time);
+            var result = await _getWeather.ReturnWeatherBasedOnQueries(lat, lon, time);
             return View(result);
         }
     }
