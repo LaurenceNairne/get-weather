@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using aspnet_thirdpartyapi.Models;
 
 namespace aspnet_thirdpartyapi.Services
