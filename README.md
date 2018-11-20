@@ -179,10 +179,93 @@ Finally, all fields are required, so if any are left blank, the request will not
 
 ### Output Model
 
+```csharp
+public class WeatherModel
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public Currently Currently { get; set; }
+    }
+```
 
+Our `WeatherModel` will output values for Deserialized data matching the properties Latitude, Longitude and our data object `Currently`. More on this in the section below.
 
 ### Data class
+```csharp
+[DataContract]
+public class Currently
+{
+    [DataMember(Name = "time")]
+    public int Time { get; set; }
+
+    [DataMember(Name = "summary")]
+    public string Summary { get; set; }
+
+    [DataMember(Name = "temperature")]
+    public string Temperature { get; set; }
+
+    [DataMember(Name = "humidity")]
+    public string Humidity { get; set; }
+}
+```
+This class exists purely to provide a structure that the API output can be deserialized into. In the JSON data at the DarkSkyAPI, we have a structure that looks like the following:
+
+```json
+{
+  "latitude": 42.3601,
+  "longitude": -71.0589,
+  "timezone": "America/New_York",
+  "currently": {
+      "time": 1509993277,
+      "summary": "Drizzle",
+      "icon": "rain",
+      "nearestStormDistance": 0,
+      ...   
+}
+```
+As we can see, `currently` is a container for various properties, and these are the properties we want to be returned when we send a request to this API. As such, we need to somewhat mimic the structure, so that when the data is returned and we're deserializing it, it will fit neatly into a usable structure within the `WeatherModel` (see above).
+
+It's worth mentioning that we can extend our `Currently` class to contain any or all of the properties available within the `currently` container in the data. We've just picked a few to demonstrate this.
+
+The `[DataContract]` and `[DataMember]` attributes specify which properties should be serialized - I need to get a better handle on how it works though, I've just had a cursory reading of the docs on this subject.
+
 ## Views
+We have two rendered views: `Index` and `GetTheWeather`. `Index` is the default view returned at the root URL of our application. It is comrpised of a form with fields to populate latitude, longitude and time.
+
+```cshtml
+@model WeatherEditModel
+@{ 
+    ViewBag.Title = "WeatherGetter";
+}
+
+<h1>Weather Getter</h1>
+<form method="post">
+    <div>
+        <label asp-for="Latitude"></label>
+        <input asp-for="Latitude" />
+        <span asp-validation-for="Latitude"></span>
+    </div>
+    <div>
+        <label asp-for="Longitude"></label>
+        <input asp-for="Longitude" />
+        <span asp-validation-for="Longitude"></span>
+    </div>
+    <div>
+        <label asp-for="Time"></label>
+        <input asp-for="Time" />
+        <span asp-validation-for="Time"></span>
+    </div>
+    <input type="submit" name="GetWeather" value="Get Weather" />
+</form>
+```
+We have a `model` directive that calls upon the `WeatherEditModel` class. This allows us to use IntelliSense when referring to properties in that model. We can still use the properties without it, but IntelliSense won't be able to help us avoid typos, etc. We add some C# to dictate the value of `ViewBag.Title` because we're using a `_Layout` view that is managing the HTML boilerplate code (including the <title> element). The rest is fairly straight forward, with lavels and inputs for each of the form fields and a submit button at the bottom.
+    
+It's worth noting that we're using tag helpers in our form. We use `asp-for` to evaluate our expressions against properties in the given `WeatherEditModel`, and we use `asp-validation-for` to connect to the validation attributes in our model for the given property and provide validation error messages where errors occur.
+
+Our second view will render the returned data deserialized into our WeatherModel.
+
+********************* Start from here ************************************
+
 ### Index
 ### GetTheWeather
 ### _Layout
