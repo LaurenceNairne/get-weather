@@ -1,6 +1,14 @@
 # get-weather
 This repository provides an example of connecting to a third-party API and using MVC framework to provide a form to fill out a request and a results page with the expected data returned.
 
+It's possibly worth mentioning that I was focusing mostly on the API side, and just presented the bare minimum in terms of visual interface.
+
+Things I'd want to do to improve this:
+- Add tests
+- Make it look nicer
+- Allow a user to enter a Town/City name instead of coordinates
+- Provide more readable validation errors for my fields that require a specific regular expression
+
 ## Startup.cs
 Our startup class is fairly straight forward in this one. We only register two further services:
 
