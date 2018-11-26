@@ -230,8 +230,11 @@ It's worth mentioning that we can extend our `Currently` class to contain any or
 The `[DataContract]` and `[DataMember]` attributes specify which properties should be serialized - I need to get a better handle on how it works though, I've just had a cursory reading of the docs on this subject.
 
 ## Views
-We have two rendered views: `Index` and `GetTheWeather`. `Index` is the default view returned at the root URL of our application. It is comrpised of a form with fields to populate latitude, longitude and time.
+We have two rendered views: `Index` and `GetTheWeather`. `Index` is the default view returned at the root URL of our application. It is comprised of a form with fields to populate latitude, longitude and time.
 
+Our second view will render the returned data deserialized into our WeatherModel.
+
+### Index
 ```cshtml
 @model WeatherEditModel
 @{ 
@@ -258,17 +261,108 @@ We have two rendered views: `Index` and `GetTheWeather`. `Index` is the default 
     <input type="submit" name="GetWeather" value="Get Weather" />
 </form>
 ```
-We have a `model` directive that calls upon the `WeatherEditModel` class. This allows us to use IntelliSense when referring to properties in that model. We can still use the properties without it, but IntelliSense won't be able to help us avoid typos, etc. We add some C# to dictate the value of `ViewBag.Title` because we're using a `_Layout` view that is managing the HTML boilerplate code (including the <title> element). The rest is fairly straight forward, with lavels and inputs for each of the form fields and a submit button at the bottom.
+We have a `model` directive that calls upon the `WeatherEditModel` class. This allows us to use IntelliSense when referring to properties in that model. We can still use the properties without it, but IntelliSense won't be able to help us avoid typos, etc. We add a C# snippet to dictate the value of `ViewBag.Title` because we're using a `_Layout` view that is managing the HTML boilerplate (including the <title> element). The rest is fairly straight forward, with labels and inputs for each of the form fields and a submit button at the bottom.
     
 It's worth noting that we're using tag helpers in our form. We use `asp-for` to evaluate our expressions against properties in the given `WeatherEditModel`, and we use `asp-validation-for` to connect to the validation attributes in our model for the given property and provide validation error messages where errors occur.
 
-Our second view will render the returned data deserialized into our WeatherModel.
-
-********************* Start from here ************************************
-
-### Index
 ### GetTheWeather
-### _Layout
-### _ViewStart
-### _ViewImports
+```cshtml
+@model WeatherModel
+@{
+    ViewBag.Title = "Gotten Weather";
 
+    int x = (int)Convert.ToDouble(Model.Currently.Temperature);
+    double y = Convert.ToDouble(Model.Currently.Humidity) * 100.00;
+}
+
+<h3>Latitude: @Model.Latitude</h3>
+<h3>Longitude: @Model.Longitude</h3>
+<div>
+    <p>Summary: @Model.Currently.Summary</p>
+    <p>Temperature: @x &#8451</p>
+    <p>Humidity: @y &#37</p>
+</div>
+<div>
+    <a asp-action="Index" asp-controller="Home">Back</a>
+</div>
+```
+Bar some tweaks to the visual presentation of the data, this view is very straight forward. We have a `model` directive to pull in the `WeatherModel`, we have our C# snippet to provide a value for the `ViewBag.Title` property, then we create two variables: `x` and `y`.
+
+The DarkSky API provides the `Temperature` property as a `string` but with two decimal places in the number. We only want to see the rounded (to nearest integer) number on the page, so we first convert `Temperature` to a `double`, then explicitly cast this to an `int`, before assigning it to our `x` variable.
+
+The API also provides the `Humidity` property as a `string`, but it represents the humidity percentage as a floating point value between 0 and 1. As I've never seen humidity represented on a weather site in such a way (it's normally shown as 'X%'), we have our `y` variable to reformat it. We simply convert `Humidity` to a `double` and multiply this by 100 to get our percentage.
+
+We've set our page to display the latitude and longitude of our search as the headers. Given further work, I'd probably try to connect to another API in order to retrieve the name of location that these coordinates represent, but this at least shows what you searched for.
+
+We then display the summary of the weather forecast, the temperature (pulling in our `x` variable) and the humidity (pulling in our `y` variable). Possibly worth noting that I've added the 'degrees Celcius' and 'percent' symbols for good measure.
+
+Finally we have a link to return to the index page and the form to search a new forecast.
+
+### _Layout
+```cshtml
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <div>
+        @RenderBody()
+    </div>
+</body>
+</html>
+```
+A layout view is a special view that is processed by the Razor Engine before rendering a page (where applicable). It allows us to provide the html boilerplate code that will be consistent throughout once for every view that uses the layout. Other than the basic page elements you'd see in any normal html page, we have a title element that simply displays the value of the `ViewBag.Title` property - you'll see that we supply values for this property on the views that use this layout.
+
+We then call `RenderBody()` in the required location in the layout so that the Razor Engine knows where to put the specific view code. To illustrate this, when rendering the 'Gotten Weather' page, the HTML looks like the following:
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width">
+        <title>Gotten Weather</title>
+    </head>
+    <body>
+        <div>        
+            <h3>Latitude: 51.460575</h3>
+            <h3>Longitude: -0.21718</h3>
+            <div>
+                <p>Summary: Partly Cloudy</p>
+                <p>Temperature: 7 ℃</p>
+                <p>Humidity: 81 %</p>
+            </div>
+            <div>
+                <a href="/">Back</a>
+            </div>
+        </div>
+    </body>
+</html>
+```
+As you can see, all `GetTheWeather` view code has been placed inside the `<div>` inside `<body>`
+
+### _ViewStart
+This is another special view. It is handled by the Razor Engine before any other views, so it's a good place to put code that needs to be handled up front.
+
+In our case, we're going to use it to assign our `_Layout` view to all of our views:
+
+```cshtml
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+```
+We can override this on a view level simply by assigning a specific layout in the view file, or we could have a second `_ViewStart` file that is more local to the view itself (e.g. in the same sub-directory).
+
+### _ViewImports
+A `_ViewImports` file is again another special view. It is used to import helpful namespaces and other useful components that we will need to call upon in our views.
+
+In our case, we using this file to call in the namespace that contains our models and to allow us to access the default MVC tag helpers:
+
+```cshtml
+@using aspnet_thirdpartyapi.Models
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+```
+Pulling in our models namespace means we do not need to fully qualify our model class names when we use the `@model` directive (so it just cuts down on keystrokes). Adding the tag helpers means we can clean up our syntax in the views themselves, cutting down on `@HtmlHelper` usage.
